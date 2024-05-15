@@ -4,16 +4,16 @@
     <LoadingIndicatorPage :show-content="channel != null && !channel.error">
         <img
             v-if="channel.bannerUrl"
-            :src="channel.bannerUrl"
-            class="w-full py-1.5 h-30 md:h-50 object-cover"
             loading="lazy"
+            :src="channel.bannerUrl"
+            class="h-30 w-full object-cover py-1.5 md:h-50"
         />
-        <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="flex flex-col items-center justify-between md:flex-row">
             <div class="flex place-items-center">
-                <img height="48" width="48" class="rounded-full m-1" :src="channel.avatarUrl" />
-                <div class="flex gap-1 items-center">
-                    <h1 v-text="channel.name" class="!text-xl" />
-                    <font-awesome-icon class="!text-xl" v-if="channel.verified" icon="check" />
+                <img height="48" width="48" class="m-1 rounded-full" :src="channel.avatarUrl" />
+                <div class="flex items-center gap-1">
+                    <h1 class="!text-xl" v-text="channel.name" />
+                    <i v-if="channel.verified" class="i-fa6-solid:check !text-xl" />
                 </div>
             </div>
 
@@ -21,38 +21,46 @@
                 <button
                     class="btn"
                     @click="subscribeHandler"
-                    v-t="{
-                        path: `actions.${subscribed ? 'unsubscribe' : 'subscribe'}`,
-                        args: { count: numberFormat(channel.subscriberCount) },
-                    }"
+                    v-text="
+                        $t('actions.' + (subscribed ? 'unsubscribe' : 'subscribe')) +
+                        ' - ' +
+                        numberFormat(channel.subscriberCount)
+                    "
+                ></button>
+
+                <button
+                    v-if="subscribed"
+                    v-t="'actions.add_to_group'"
+                    class="btn"
+                    @click="showGroupModal = true"
                 ></button>
 
                 <!-- RSS Feed button -->
                 <a
+                    v-if="channel.id"
                     aria-label="RSS feed"
                     title="RSS feed"
                     role="button"
-                    v-if="channel.id"
                     :href="`${apiUrl()}/feed/unauthenticated/rss?channels=${channel.id}`"
                     target="_blank"
                     class="btn flex-col"
                 >
-                    <font-awesome-icon icon="rss" />
+                    <i class="i-fa6-solid:rss" />
                 </a>
             </div>
         </div>
 
         <CollapsableText :text="channel.description" />
 
-        <WatchOnYouTubeButton :link="`https://youtube.com/channel/${this.channel.id}`" />
+        <WatchOnButton :link="`https://youtube.com/channel/${channel.id}`" />
 
-        <div class="flex my-2 mx-1">
+        <div class="mx-1 my-2 flex">
             <button
                 v-for="(tab, index) in tabs"
                 :key="tab.name"
                 class="btn mr-2"
-                @click="loadTab(index)"
                 :class="{ active: selectedTab == index }"
+                @click="loadTab(index)"
             >
                 <span v-text="tab.translatedName"></span>
             </button>
@@ -70,23 +78,27 @@
                 hide-channel
             />
         </div>
+
+        <AddToGroupModal v-if="showGroupModal" :channel-id="channel.id.substr(-24)" @close="showGroupModal = false" />
     </LoadingIndicatorPage>
 </template>
 
 <script>
 import ErrorHandler from "./ErrorHandler.vue";
 import ContentItem from "./ContentItem.vue";
-import WatchOnYouTubeButton from "./WatchOnYouTubeButton.vue";
+import WatchOnButton from "./WatchOnButton.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import CollapsableText from "./CollapsableText.vue";
+import AddToGroupModal from "./AddToGroupModal.vue";
 
 export default {
     components: {
         ErrorHandler,
         ContentItem,
-        WatchOnYouTubeButton,
+        WatchOnButton,
         LoadingIndicatorPage,
         CollapsableText,
+        AddToGroupModal,
     },
     data() {
         return {
@@ -95,6 +107,7 @@ export default {
             tabs: [],
             selectedTab: 0,
             contentItems: [],
+            showGroupModal: false,
         };
     },
     mounted() {
@@ -114,24 +127,8 @@ export default {
     methods: {
         async fetchSubscribedStatus() {
             if (!this.channel.id) return;
-            if (!this.authenticated) {
-                this.subscribed = this.isSubscribedLocally(this.channel.id);
-                return;
-            }
 
-            this.fetchJson(
-                this.authApiUrl() + "/subscribed",
-                {
-                    channelId: this.channel.id,
-                },
-                {
-                    headers: {
-                        Authorization: this.getAuthToken(),
-                    },
-                },
-            ).then(json => {
-                this.subscribed = json.subscribed;
-            });
+            this.subscribed = await this.fetchSubscriptionStatus(this.channel.id);
         },
         async fetchChannel() {
             const url = this.$route.path.includes("@")
@@ -148,6 +145,7 @@ export default {
                         this.contentItems = this.channel.relatedStreams;
                         this.fetchSubscribedStatus();
                         this.updateWatched(this.channel.relatedStreams);
+                        this.fetchDeArrowContent(this.channel.relatedStreams);
                         this.tabs.push({
                             translatedName: this.$t("video.videos"),
                         });
@@ -186,6 +184,7 @@ export default {
                 this.loading = false;
                 this.updateWatched(json.relatedStreams);
                 json.relatedStreams.map(stream => this.contentItems.push(stream));
+                this.fetchDeArrowContent(this.contentItems);
             });
         },
         fetchChannelTabNextPage() {
@@ -196,25 +195,14 @@ export default {
                 this.tabs[this.selectedTab].tabNextPage = json.nextpage;
                 this.loading = false;
                 json.content.map(item => this.contentItems.push(item));
+                this.fetchDeArrowContent(this.contentItems);
                 this.tabs[this.selectedTab].content = this.contentItems;
             });
         },
         subscribeHandler() {
-            if (this.authenticated) {
-                this.fetchJson(this.authApiUrl() + (this.subscribed ? "/unsubscribe" : "/subscribe"), null, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        channelId: this.channel.id,
-                    }),
-                    headers: {
-                        Authorization: this.getAuthToken(),
-                        "Content-Type": "application/json",
-                    },
-                });
-            } else {
-                if (!this.handleLocalSubscriptions(this.channel.id)) return;
-            }
-            this.subscribed = !this.subscribed;
+            this.toggleSubscriptionState(this.channel.id, this.subscribed).then(success => {
+                if (success) this.subscribed = !this.subscribed;
+            });
         },
         getTranslatedTabName(tabName) {
             let translatedTabName = tabName;
@@ -225,8 +213,8 @@ export default {
                 case "playlists":
                     translatedTabName = this.$t("titles.playlists");
                     break;
-                case "channels":
-                    translatedTabName = this.$t("titles.channels");
+                case "albums":
+                    translatedTabName = this.$t("titles.albums");
                     break;
                 case "shorts":
                     translatedTabName = this.$t("video.shorts");
@@ -258,6 +246,7 @@ export default {
                 data: this.tabs[index].data,
             }).then(tab => {
                 this.contentItems = this.tabs[index].content = tab.content;
+                this.fetchDeArrowContent(this.contentItems);
                 this.tabs[this.selectedTab].tabNextPage = tab.nextpage;
             });
         },

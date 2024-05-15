@@ -1,10 +1,10 @@
 <template>
     <div class="flex">
         <button @click="$router.go(-1) || $router.push('/')">
-            <font-awesome-icon icon="chevron-left" /><span class="ml-1.5" v-t="'actions.back'" />
+            <i class="i-fa6-solid:chevron-left" /><span v-t="'actions.back'" class="ml-1.5" />
         </button>
     </div>
-    <h1 v-t="'titles.preferences'" class="font-bold text-center" />
+    <h1 v-t="'titles.preferences'" class="text-center font-bold" />
     <hr />
     <label for="ddlTheme" class="pref">
         <strong v-t="'actions.theme'" />
@@ -34,7 +34,7 @@
         </select>
     </label>
 
-    <h2 class="text-center" v-t="'titles.player'" />
+    <h2 v-t="'titles.player'" class="text-center" />
     <label class="pref" for="chkAutoPlayVideo">
         <strong v-t="'actions.autoplay_video'" />
         <input
@@ -126,11 +126,30 @@
             @change="onChange($event)"
         />
     </label>
+    <!-- chapters layout on mobile -->
+    <label class="pref lg:invisible" for="chkMinimizeChapters">
+        <strong v-t="'actions.chapters_layout_mobile'" />
+
+        <select id="ddlDefaultHomepage" v-model="mobileChapterLayout" class="select w-auto" @change="onChange($event)">
+            <option v-t="'video.chapters_horizontal'" value="Horizontal" />
+            <option v-t="'video.chapters_vertical'" value="Vertical" />
+        </select>
+    </label>
     <label class="pref" for="chkShowWatchOnYouTube">
         <strong v-t="'actions.show_watch_on_youtube'" />
         <input
             id="chkShowWatchOnYouTube"
             v-model="showWatchOnYouTube"
+            class="checkbox"
+            type="checkbox"
+            @change="onChange($event)"
+        />
+    </label>
+    <label class="pref" for="chkShowSearchSuggestions">
+        <strong v-t="'actions.show_search_suggestions'" />
+        <input
+            id="chkShowSearchSuggestions"
+            v-model="searchSuggestions"
             class="checkbox"
             type="checkbox"
             @change="onChange($event)"
@@ -165,7 +184,7 @@
         <select
             id="ddlEnabledCodecs"
             v-model="enabledCodecs"
-            class="select w-auto h-auto"
+            class="select h-auto w-auto"
             multiple
             @change="onChange($event)"
         >
@@ -188,6 +207,16 @@
             @change="onChange($event)"
         />
     </label>
+    <label class="pref" for="txtPrefetchLimit">
+        <strong v-t="'actions.concurrent_prefetch_limit'" />
+        <input
+            id="txtPrefetchLimit"
+            v-model="prefetchLimit"
+            class="input w-24"
+            type="text"
+            @change="onChange($event)"
+        />
+    </label>
 
     <h2 class="text-center">SponsorBlock</h2>
     <p class="text-center">
@@ -204,7 +233,7 @@
         />
     </label>
     <div v-if="sponsorBlock">
-        <label v-for="[name, item] in skipOptions" class="pref" :for="'ddlSkip_' + name" :key="name">
+        <label v-for="[name, item] in skipOptions" :key="name" class="pref" :for="'ddlSkip_' + name">
             <strong v-t="item.label" />
             <select :id="'ddlSkip_' + name" v-model="item.value" class="select w-auto" @change="onChange($event)">
                 <option v-t="'actions.no'" value="no" />
@@ -233,7 +262,18 @@
             />
         </label>
     </div>
-    <h2 class="text-center" v-t="'titles.instance'" />
+
+    <h2 v-t="'titles.dearrow'" class="text-center" />
+    <p class="text-center">
+        <span v-t="'actions.uses_api_from'" /><a class="link" href="https://sponsor.ajay.app/">sponsor.ajay.app</a>
+    </p>
+    <label class="pref" for="chkDeArrow">
+        <strong v-t="'actions.enable_dearrow'" />
+        <input id="chkDeArrow" v-model="dearrow" class="checkbox" type="checkbox" @change="onChange($event)" />
+    </label>
+
+    <h2 v-t="'titles.instance'" class="text-center" />
+    <p v-t="'actions.instances_not_shown'" class="text-center" />
     <label class="pref" for="ddlInstanceSelection">
         <strong v-text="`${$t('actions.instance_selection')}:`" />
         <select id="ddlInstanceSelection" v-model="selectedInstance" class="select w-auto" @change="onChange($event)">
@@ -273,11 +313,15 @@
             </select>
         </label>
     </template>
+    <div class="pref">
+        <span v-t="'titles.custom_instances'" class="w-max" />
+        <button v-t="'actions.customize'" class="btn" @click="showCustomInstancesModal = true" />
+    </div>
     <br />
 
     <!-- options that are visible only when logged in -->
-    <div v-if="this.authenticated">
-        <h2 class="text-center" v-t="'titles.account'"></h2>
+    <div v-if="authenticated">
+        <h2 v-t="'titles.account'" class="text-center"></h2>
         <label class="pref" for="txtDeleteAccountPassword">
             <strong v-t="'actions.delete_account'" />
             <div class="flex items-center">
@@ -285,22 +329,22 @@
                     id="txtDeleteAccountPassword"
                     ref="txtDeleteAccountPassword"
                     v-model="password"
-                    v-on:keyup.enter="deleteAccount"
                     :placeholder="$t('login.password')"
                     :aria-label="$t('login.password')"
-                    class="input w-auto mr-2"
+                    class="input mr-2 w-auto"
                     type="password"
+                    @keyup.enter="deleteAccount"
                 />
-                <a class="btn w-auto" @click="deleteAccount" v-t="'actions.delete_account'" />
+                <a v-t="'actions.delete_account'" class="btn w-auto" @click="deleteAccount" />
             </div>
         </label>
         <div class="pref">
-            <a class="btn w-auto" @click="logout" v-t="'actions.logout'" />
+            <a v-t="'actions.logout'" class="btn w-auto" @click="logout" />
             <a
+                v-t="'actions.invalidate_session'"
                 class="btn w-auto"
                 style="margin-left: 0.5em"
                 @click="invalidateSession"
-                v-t="'actions.invalidate_session'"
             />
         </div>
         <br />
@@ -313,12 +357,13 @@
                 <th v-t="'preferences.instance_locations'" />
                 <th v-t="'preferences.has_cdn'" />
                 <th v-t="'preferences.registered_users'" />
-                <th class="lt-md:hidden" v-t="'preferences.version'" />
+                <th v-t="'preferences.version'" class="lt-md:hidden" />
                 <th v-t="'preferences.up_to_date'" />
+                <th v-t="'preferences.uptime_30d'" />
                 <th v-t="'preferences.ssl_score'" />
             </tr>
         </thead>
-        <tbody v-for="instance in instances" :key="instance.name">
+        <tbody v-for="instance in publicInstances" :key="instance.name">
             <tr>
                 <td v-text="instance.name" />
                 <td v-text="instance.locations" />
@@ -326,8 +371,9 @@
                 <td v-text="instance.registered" />
                 <td class="lt-md:hidden" v-text="instance.version" />
                 <td v-text="`${instance.up_to_date ? '&#9989;' : '&#10060;'}`" />
+                <td v-text="`${Number.parseFloat(instance.uptime_30d.toFixed(2))}%`" />
                 <td>
-                    <a :href="sslScore(instance.api_url)" target="_blank" v-t="'actions.view_ssl_score'" />
+                    <a v-t="'actions.view_ssl_score'" :href="sslScore(instance.api_url)" target="_blank" />
                 </td>
             </tr>
         </tbody>
@@ -335,28 +381,42 @@
     <br />
     <p v-t="'info.preferences_note'" />
     <br />
-    <button class="btn" v-t="'actions.reset_preferences'" @click="showConfirmResetPrefsDialog = true" />
-    <button class="btn mx-4" v-t="'actions.backup_preferences'" @click="backupPreferences()" />
-    <label for="fileSelector" class="btn" v-t="'actions.restore_preferences'" @click="restorePreferences()" />
-    <input class="hidden" id="fileSelector" ref="fileSelector" type="file" @change="restorePreferences()" />
+    <button v-t="'actions.reset_preferences'" class="btn" @click="showConfirmResetPrefsDialog = true" />
+    <button v-t="'actions.backup_preferences'" class="btn mx-4" @click="backupPreferences()" />
+    <label v-t="'actions.restore_preferences'" for="fileSelector" class="btn" @click="restorePreferences()" />
+    <input id="fileSelector" ref="fileSelector" class="hidden" type="file" @change="restorePreferences()" />
     <ConfirmModal
         v-if="showConfirmResetPrefsDialog"
+        :message="$t('actions.confirm_reset_preferences')"
         @close="showConfirmResetPrefsDialog = false"
         @confirm="resetPreferences()"
-        :message="$t('actions.confirm_reset_preferences')"
+    />
+    <CustomInstanceModal
+        v-if="showCustomInstancesModal"
+        @close="
+            showCustomInstancesModal = false;
+            fetchInstances();
+        "
     />
 </template>
 
 <script>
 import CountryMap from "@/utils/CountryMaps/en.json";
 import ConfirmModal from "./ConfirmModal.vue";
+import CustomInstanceModal from "./CustomInstanceModal.vue";
 export default {
+    components: {
+        ConfirmModal,
+        CustomInstanceModal,
+    },
     data() {
         return {
+            mobileChapterLayout: "Vertical",
             selectedInstance: null,
             authInstance: false,
             selectedAuthInstance: null,
-            instances: [],
+            customInstances: [],
+            publicInstances: [],
             sponsorBlock: true,
             skipOptions: new Map([
                 ["sponsor", { value: "auto", label: "actions.skip_sponsors" }],
@@ -371,6 +431,7 @@ export default {
             ]),
             showMarkers: true,
             minSegmentLength: 0,
+            dearrow: false,
             selectedTheme: "dark",
             autoPlayVideo: true,
             autoDisplayCaptions: false,
@@ -383,10 +444,11 @@ export default {
             countrySelected: "US",
             defaultHomepage: "trending",
             minimizeComments: false,
-            minimizeDescription: false,
+            minimizeDescription: true,
             minimizeRecommendations: false,
             minimizeChapters: false,
             showWatchOnYouTube: false,
+            searchSuggestions: true,
             watchHistory: false,
             searchHistory: false,
             hideWatched: false,
@@ -431,6 +493,7 @@ export default {
                 { code: "ro", name: "Română" },
                 { code: "ru", name: "Русский" },
                 { code: "si", name: "සිංහල" },
+                { code: "sl", name: "Slovenian" },
                 { code: "sr", name: "Српски" },
                 { code: "sv", name: "Svenska" },
                 { code: "ta", name: "தமிழ்" },
@@ -444,9 +507,16 @@ export default {
             enabledCodecs: ["vp9", "avc"],
             disableLBRY: false,
             proxyLBRY: false,
+            prefetchLimit: 2,
             password: null,
             showConfirmResetPrefsDialog: false,
+            showCustomInstancesModal: false,
         };
+    },
+    computed: {
+        instances() {
+            return [...this.publicInstances, ...this.customInstances];
+        },
     },
     activated() {
         document.title = this.$t("titles.preferences") + " - Piped";
@@ -454,19 +524,10 @@ export default {
     async mounted() {
         if (Object.keys(this.$route.query).length > 0) this.$router.replace({ query: {} });
 
-        this.fetchJson("https://piped-instances.kavin.rocks/").then(resp => {
-            this.instances = resp;
-            if (!this.instances.some(instance => instance.api_url == this.apiUrl()))
-                this.instances.push({
-                    name: "Custom Instance",
-                    api_url: this.apiUrl(),
-                    locations: "Unknown",
-                    cdn: false,
-                });
-        });
+        this.fetchInstances();
 
         if (this.testLocalStorage) {
-            this.selectedInstance = this.getPreferenceString("instance", "https://pipedapi.kavin.rocks");
+            this.selectedInstance = this.getPreferenceString("instance", import.meta.env.VITE_PIPED_API);
             this.authInstance = this.getPreferenceBoolean("authInstance", false);
             this.selectedAuthInstance = this.getPreferenceString("auth_instance_url", this.selectedInstance);
 
@@ -490,6 +551,7 @@ export default {
 
             this.showMarkers = this.getPreferenceBoolean("showMarkers", true);
             this.minSegmentLength = Math.max(this.getPreferenceNumber("minSegmentLength", 0), 0);
+            this.dearrow = this.getPreferenceBoolean("dearrow", false);
             this.selectedTheme = this.getPreferenceString("theme", "dark");
             this.autoPlayVideo = this.getPreferenceBoolean("playerAutoPlay", true);
             this.autoDisplayCaptions = this.getPreferenceBoolean("autoDisplayCaptions", false);
@@ -500,17 +562,20 @@ export default {
             this.countrySelected = this.getPreferenceString("region", "US");
             this.defaultHomepage = this.getPreferenceString("homepage", "trending");
             this.minimizeComments = this.getPreferenceBoolean("minimizeComments", false);
-            this.minimizeDescription = this.getPreferenceBoolean("minimizeDescription", false);
+            this.minimizeDescription = this.getPreferenceBoolean("minimizeDescription", true);
             this.minimizeRecommendations = this.getPreferenceBoolean("minimizeRecommendations", false);
             this.minimizeChapters = this.getPreferenceBoolean("minimizeChapters", false);
             this.showWatchOnYouTube = this.getPreferenceBoolean("showWatchOnYouTube", false);
+            this.searchSuggestions = this.getPreferenceBoolean("searchSuggestions", true);
             this.watchHistory = this.getPreferenceBoolean("watchHistory", false);
             this.searchHistory = this.getPreferenceBoolean("searchHistory", false);
             this.selectedLanguage = this.getPreferenceString("hl", await this.defaultLanguage);
             this.enabledCodecs = this.getPreferenceString("enabledCodecs", "vp9,avc").split(",");
             this.disableLBRY = this.getPreferenceBoolean("disableLBRY", false);
             this.proxyLBRY = this.getPreferenceBoolean("proxyLBRY", false);
+            this.prefetchLimit = this.getPreferenceNumber("prefetchLimit", 2);
             this.hideWatched = this.getPreferenceBoolean("hideWatched", false);
+            this.mobileChapterLayout = this.getPreferenceString("mobileChapterLayout", "Vertical");
             if (this.selectedLanguage != "en") {
                 try {
                     this.CountryMap = await import(`../utils/CountryMaps/${this.selectedLanguage}.json`).then(
@@ -546,6 +611,9 @@ export default {
 
                 localStorage.setItem("showMarkers", this.showMarkers);
                 localStorage.setItem("minSegmentLength", this.minSegmentLength);
+
+                localStorage.setItem("dearrow", this.dearrow);
+
                 localStorage.setItem("theme", this.selectedTheme);
                 localStorage.setItem("playerAutoPlay", this.autoPlayVideo);
                 localStorage.setItem("autoDisplayCaptions", this.autoDisplayCaptions);
@@ -560,6 +628,7 @@ export default {
                 localStorage.setItem("minimizeRecommendations", this.minimizeRecommendations);
                 localStorage.setItem("minimizeChapters", this.minimizeChapters);
                 localStorage.setItem("showWatchOnYouTube", this.showWatchOnYouTube);
+                localStorage.setItem("searchSuggestions", this.searchSuggestions);
                 localStorage.setItem("watchHistory", this.watchHistory);
                 localStorage.setItem("searchHistory", this.searchHistory);
                 if (!this.searchHistory) localStorage.removeItem("search_history");
@@ -567,10 +636,27 @@ export default {
                 localStorage.setItem("enabledCodecs", this.enabledCodecs.join(","));
                 localStorage.setItem("disableLBRY", this.disableLBRY);
                 localStorage.setItem("proxyLBRY", this.proxyLBRY);
+                localStorage.setItem("prefetchLimit", this.prefetchLimit);
                 localStorage.setItem("hideWatched", this.hideWatched);
+                localStorage.setItem("mobileChapterLayout", this.mobileChapterLayout);
 
                 if (shouldReload) window.location.reload();
             }
+        },
+        async fetchInstances() {
+            this.customInstances = this.getCustomInstances();
+
+            this.fetchJson(import.meta.env.VITE_PIPED_INSTANCES).then(resp => {
+                this.publicInstances = resp;
+                if (!this.publicInstances.some(instance => instance.api_url == this.apiUrl()))
+                    this.publicInstances.push({
+                        name: "Selected Instance",
+                        api_url: this.apiUrl(),
+                        locations: "Unknown",
+                        cdn: false,
+                        uptime_30d: 100,
+                    });
+            });
         },
         sslScore(url) {
             return "https://www.ssllabs.com/ssltest/analyze.html?d=" + new URL(url).host + "&latest";
@@ -594,14 +680,14 @@ export default {
             // reset the auth token
             localStorage.removeItem("authToken" + this.hashCode(this.authApiUrl()));
             // redirect to trending page
-            window.location = "/";
+            window.location = import.meta.env.BASE_URL;
         },
         resetPreferences() {
             this.showConfirmResetPrefsDialog = false;
             // clear the local storage
             localStorage.clear();
             // redirect to the home page
-            window.location = "/";
+            window.location = import.meta.env.BASE_URL;
         },
         async invalidateSession() {
             this.fetchJson(this.authApiUrl() + "/logout", null, {
@@ -629,9 +715,6 @@ export default {
                 window.location.reload();
             });
         },
-    },
-    components: {
-        ConfirmModal,
     },
 };
 </script>

@@ -14,14 +14,18 @@
         "livestreams": "Прямые трансляции",
         "channels": "Каналы",
         "bookmarks": "Закладки",
-        "channel_groups": "Группы каналов"
+        "channel_groups": "Группы каналов",
+        "dearrow": "DeArrow",
+        "albums": "Альбомы",
+        "custom_instances": "Пользовательские серверы"
     },
     "player": {
-        "watch_on": "Смотреть на {0}"
+        "watch_on": "Посмотреть на {0}",
+        "failed": "Ошибка с кодом {0}, откройте логи, чтобы узнать больше"
     },
     "actions": {
-        "subscribe": "Подписаться - {count}",
-        "unsubscribe": "Отписаться - {count}",
+        "subscribe": "Подписаться",
+        "unsubscribe": "Отписаться",
         "view_subscriptions": "Просмотреть подписки",
         "sort_by": "Сортировка по:",
         "most_recent": "Самые новые",
@@ -39,7 +43,7 @@
         "skip_self_promo": "Пропускать саморекламу",
         "skip_non_music": "Пропускать тишину в музыкальных роликах",
         "theme": "Тема",
-        "auto": "Автоматически",
+        "auto": "Авто",
         "dark": "Тёмная",
         "light": "Светлая",
         "autoplay_video": "Автоматическое проигрывание видео",
@@ -55,11 +59,11 @@
         "instances_list": "Список зеркал сервиса Piped",
         "enabled_codecs": "Включённые кодеки (Можно выбрать несколько)",
         "instance_selection": "Выбор зеркала сервиса Piped",
-        "show_more": "Показать больше",
+        "show_more": "Показать еще",
         "yes": "Да",
         "no": "Нет",
         "export_to_json": "Экспорт в JSON",
-        "import_from_json": "Импорт из JSON/CSV",
+        "import_from_json": "Импорт из JSON",
         "loop_this_video": "Повтор текущего видео",
         "auto_play_next_video": "Сразу проигрывать следующее рекомендованное видео",
         "donations": "Пожертвования на разработку",
@@ -131,7 +135,27 @@
         "autoplay_next_countdown": "Отсчет по умолчанию до следующего видео (в секундах)",
         "dismiss": "Отклонить",
         "group_name": "Имя группы",
-        "create_group": "Создать группу"
+        "create_group": "Создать группу",
+        "cancel": "Отмена",
+        "edit_playlist": "Редактировать плейлист",
+        "playlist_description": "Описание плейлиста",
+        "okay": "Хорошо",
+        "auto_display_captions": "Авто-отображение субтитров",
+        "playlist_name": "Название плейлиста",
+        "show_search_suggestions": "Показать поисковые предложения",
+        "chapters_layout_mobile": "Расположение глав в мобильном виде",
+        "delete_automatically": "Автоматическое удаление после",
+        "enable_dearrow": "Включить DeArrow",
+        "generate_qrcode": "Сгенерировать QR Код",
+        "import_from_json_csv": "Импорт из JSON/CSV",
+        "download_frame": "Скачать текущий кадр",
+        "instance_privacy_policy": "Политика конфиденциальности",
+        "add_to_group": "Добавить в группу",
+        "instances_not_shown": "Общедоступные экземпляры, которые здесь не показаны, в настоящее время недоступны.",
+        "concurrent_prefetch_limit": "Предел одновременной предзагрузки трансляций",
+        "customize": "Персонализация",
+        "invalid_url": "Неправильная ссылка!",
+        "add": "Добавить"
     },
     "comment": {
         "pinned_by": "Закреплено пользователем {author}",
@@ -146,11 +170,15 @@
         "ssl_score": "Оценка настроек SSL",
         "registered_users": "Зарегистрировано пользователей",
         "version": "Версия",
-        "up_to_date": "Версия актуальна?"
+        "up_to_date": "Версия актуальна?",
+        "uptime_30d": "Доступность (30д)",
+        "api_url": "Ссылка API"
     },
     "login": {
         "username": "Имя пользователя",
-        "password": "Пароль"
+        "password": "Пароль",
+        "password_confirm": "Повторите пароль",
+        "passwords_incorrect": "Пароль не совпадает!"
     },
     "video": {
         "videos": "Видео",
@@ -162,7 +190,11 @@
         "chapters": "Содержание",
         "shorts": "Shorts",
         "all": "Все",
-        "category": "Категория"
+        "category": "Категория",
+        "chapters_horizontal": "Горизонтально",
+        "chapters_vertical": "Вертикально",
+        "visibility": "Видимость",
+        "license": "Лицензия"
     },
     "search": {
         "did_you_mean": "Может быть вы имели в виду: {0}?",
@@ -173,7 +205,8 @@
         "music_songs": "YT Music: Композиции",
         "music_videos": "YT Music: Видео",
         "music_albums": "YT Music: Альбомы",
-        "music_playlists": "YT Music: Плейлисты"
+        "music_playlists": "YT Music: Плейлисты",
+        "music_artists": "YT Music: Исполнители"
     },
     "subscriptions": {
         "subscribed_channels_count": "Подписан на: {0}"
@@ -185,6 +218,12 @@
         "page_not_found": "Страница не найдена",
         "local_storage": "Это действие требует разрешения localStorage, включены ли cookie-файлы?",
         "register_no_email_note": "Использование электронной почты в качестве имени пользователя не рекомендуется. Продолжить?",
-        "next_video_countdown": "Воспроизведение следующего видео через {0} с."
+        "next_video_countdown": "Следующие видео через {0} с",
+        "days": "{amount} дней",
+        "hours": "{amount} час(ов)",
+        "weeks": "{amount} недель",
+        "months": "{amount} месяцев",
+        "login_note": "Войти в аккаунт созданном на этом экземпляре.",
+        "register_note": "Зарегистрируйте учетную запись для данного экземпляра Piped. Это позволит синхронизировать подписки и списки воспроизведения с учетной записью, так что они будут храниться на стороне сервера. Вы можете использовать все функции без учетной записи, но все данные будут храниться в локальном кэше вашего браузера. Пожалуйста, убедитесь, что вы НЕ используете адрес электронной почты в качестве имени пользователя, и выберите надежный пароль, который вы не используете в других местах."
     }
 }

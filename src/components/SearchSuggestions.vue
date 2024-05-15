@@ -1,15 +1,19 @@
 <template>
-    <div class="absolute suggestions-container">
+    <div class="suggestions-container absolute">
         <ul>
             <li
                 v-for="(suggestion, i) in searchSuggestions"
                 :key="i"
-                class="suggestion"
-                :class="{ 'suggestion-selected': selected === i }"
                 @mouseover="onMouseOver(i)"
-                @mousedown.stop="onClick(i)"
-                v-text="suggestion"
-            />
+                @click="setSelected(i)"
+            >
+                <router-link
+                    class="suggestion"
+                    :class="{ 'suggestion-selected': selected === i }"
+                    :to="`/results?search_query=${encodeURIComponent(suggestion)}`"
+                    >{{ suggestion }}</router-link
+                >
+            </li>
         </ul>
     </div>
 </template>
@@ -50,13 +54,16 @@ export default {
             if (!this.searchText) {
                 if (this.getPreferenceBoolean("searchHistory", false))
                     this.searchSuggestions = JSON.parse(localStorage.getItem("search_history")) ?? [];
-            } else {
+            } else if (this.getPreferenceBoolean("searchSuggestions", true)) {
                 this.searchSuggestions =
                     (
                         await this.fetchJson(this.apiUrl() + "/opensearch/suggestions", {
                             query: this.searchText,
                         })
                     )?.[1] ?? [];
+            } else {
+                this.searchSuggestions = [];
+                return;
             }
             this.searchSuggestions.unshift(this.searchText);
             this.setSelected(0);
@@ -65,13 +72,6 @@ export default {
             if (i !== this.selected) {
                 this.selected = i;
             }
-        },
-        onClick(i) {
-            this.setSelected(i);
-            this.$router.push({
-                name: "SearchResults",
-                query: { search_query: this.searchSuggestions[i] },
-            });
         },
         setSelected(val) {
             this.selected = val;
@@ -99,6 +99,6 @@ export default {
 }
 
 .suggestion {
-    @apply p-1;
+    @apply block w-full p-1;
 }
 </style>

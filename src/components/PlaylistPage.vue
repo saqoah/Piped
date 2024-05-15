@@ -1,34 +1,34 @@
 <template>
     <ErrorHandler v-if="playlist && playlist.error" :message="playlist.message" :error="playlist.error" />
 
-    <LoadingIndicatorPage :show-content="playlist" v-show="!playlist?.error">
-        <h1 class="ml-1 mb-1 mt-4 text-3xl!" v-text="playlist.name" />
+    <LoadingIndicatorPage v-show="!playlist?.error" :show-content="playlist">
+        <h1 class="mb-1 ml-1 mt-4 text-3xl!" v-text="playlist.name" />
 
-        <CollapsableText :text="playlist.description" />
+        <CollapsableText v-if="playlist?.description" :text="playlist.description" />
 
-        <div class="flex justify-between items-center mt-1">
+        <div class="mt-1 flex <md:flex-col md:items-center justify-between">
             <div>
                 <router-link class="link flex items-center gap-3" :to="playlist.uploaderUrl || '/'">
-                    <img :src="playlist.uploaderAvatar" loading="lazy" class="rounded-full" />
+                    <img loading="lazy" :src="playlist.uploaderAvatar" class="rounded-full h-12" />
                     <strong v-text="playlist.uploader" />
                 </router-link>
             </div>
-            <div>
-                <strong v-text="`${playlist.videos} ${$t('video.videos')}`" class="mr-2" />
-                <button class="btn mx-1" v-if="!isPipedPlaylist" @click="bookmarkPlaylist">
+            <div class="flex flex-wrap items-center gap-1">
+                <strong v-text="`${playlist.videos} ${$t('video.videos')}`" />
+                <button v-if="!isPipedPlaylist" class="btn mx-1" @click="bookmarkPlaylist">
                     {{ $t(`actions.${isBookmarked ? "playlist_bookmarked" : "bookmark_playlist"}`)
-                    }}<font-awesome-icon class="ml-3" icon="bookmark" />
+                    }}<i class="i-fa6-solid:bookmark ml-3" />
                 </button>
-                <button class="btn mr-1" v-if="authenticated && !isPipedPlaylist" @click="clonePlaylist">
-                    {{ $t("actions.clone_playlist") }}<font-awesome-icon class="ml-3" icon="clone" />
+                <button v-if="authenticated && !isPipedPlaylist" class="btn mr-1" @click="clonePlaylist">
+                    {{ $t("actions.clone_playlist") }}<i class="i-fa6-solid:clone ml-3" />
                 </button>
                 <button class="btn mr-1" @click="downloadPlaylistAsTxt">
                     {{ $t("actions.download_as_txt") }}
                 </button>
                 <a class="btn mr-1" :href="getRssUrl">
-                    <font-awesome-icon icon="rss" />
+                    <i class="i-fa6-solid:rss" />
                 </a>
-                <WatchOnYouTubeButton :link="`https://www.youtube.com/playlist?list=${this.$route.query.list}`" />
+                <WatchOnButton :link="`https://www.youtube.com/playlist?list=${$route.query.list}`" />
             </div>
         </div>
 
@@ -42,9 +42,9 @@
                 :index="index"
                 :playlist-id="$route.query.list"
                 :admin="admin"
-                @remove="removeVideo(index)"
                 height="94"
                 width="168"
+                @remove="removeVideo(index)"
             />
         </div>
     </LoadingIndicatorPage>
@@ -55,13 +55,13 @@ import ErrorHandler from "./ErrorHandler.vue";
 import LoadingIndicatorPage from "./LoadingIndicatorPage.vue";
 import CollapsableText from "./CollapsableText.vue";
 import VideoItem from "./VideoItem.vue";
-import WatchOnYouTubeButton from "./WatchOnYouTubeButton.vue";
+import WatchOnButton from "./WatchOnButton.vue";
 
 export default {
     components: {
         ErrorHandler,
         VideoItem,
-        WatchOnYouTubeButton,
+        WatchOnButton,
         LoadingIndicatorPage,
         CollapsableText,
     },
@@ -86,14 +86,11 @@ export default {
     mounted() {
         const playlistId = this.$route.query.list;
         if (this.authenticated && playlistId?.length == 36)
-            this.fetchJson(this.authApiUrl() + "/user/playlists", null, {
-                headers: {
-                    Authorization: this.getAuthToken(),
-                },
-            }).then(json => {
+            this.getPlaylists().then(json => {
                 if (json.error) alert(json.error);
                 else if (json.some(playlist => playlist.id === playlistId)) this.admin = true;
             });
+        else if (playlistId.startsWith("local")) this.admin = true;
         this.isPlaylistBookmarked();
     },
     activated() {
@@ -105,15 +102,13 @@ export default {
         window.removeEventListener("scroll", this.handleScroll);
     },
     methods: {
-        async fetchPlaylist() {
-            return await await this.fetchJson(this.authApiUrl() + "/playlists/" + this.$route.query.list);
-        },
         async getPlaylistData() {
-            this.fetchPlaylist()
+            this.getPlaylist(this.$route.query.list)
                 .then(data => (this.playlist = data))
                 .then(() => {
                     this.updateTitle();
                     this.updateWatched(this.playlist.relatedStreams);
+                    this.fetchDeArrowContent(this.playlist.relatedStreams);
                 });
         },
         async updateTitle() {
@@ -130,6 +125,7 @@ export default {
                     this.playlist.nextpage = json.nextpage;
                     this.loading = false;
                     json.relatedStreams.map(stream => this.playlist.relatedStreams.push(stream));
+                    this.fetchDeArrowContent(this.playlist.relatedStreams);
                 });
             }
         },

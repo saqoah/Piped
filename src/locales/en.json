@@ -13,15 +13,19 @@
         "player": "Player",
         "livestreams": "Livestreams",
         "channels": "Channels",
+        "albums": "Albums",
         "bookmarks": "Bookmarks",
-        "channel_groups": "Channel groups"
+        "channel_groups": "Channel groups",
+        "dearrow": "DeArrow",
+        "custom_instances": "Custom instances"
     },
     "player": {
-        "watch_on": "Watch on {0}"
+        "watch_on": "View on {0}",
+        "failed": "Failed with error code {0}, see logs for more info"
     },
     "actions": {
-        "subscribe": "Subscribe - {count}",
-        "unsubscribe": "Unsubscribe - {count}",
+        "subscribe": "Subscribe",
+        "unsubscribe": "Unsubscribe",
         "view_subscriptions": "View Subscriptions",
         "sort_by": "Sort by:",
         "most_recent": "Most Recent",
@@ -30,6 +34,7 @@
         "channel_name_desc": "Channel Name (Z-A)",
         "back": "Back",
         "uses_api_from": "Uses the API from ",
+        "instances_not_shown": "Public instances that are not shown here are currently unavailable.",
         "enable_sponsorblock": "Enable Sponsorblock",
         "skip_button_only": "Show skip button",
         "skip_automatically": "Automatically",
@@ -45,6 +50,7 @@
         "show_markers": "Show Markers on Player",
         "min_segment_length": "Minimum Segment Length (in seconds)",
         "skip_segment": "Skip Segment",
+        "enable_dearrow": "Enable DeArrow",
         "theme": "Theme",
         "auto": "Auto",
         "dark": "Dark",
@@ -54,20 +60,21 @@
         "audio_only": "Audio Only",
         "default_quality": "Default Quality",
         "buffering_goal": "Buffering Goal (in seconds)",
-        "country_selection": "Country Selection",
+        "country_selection": "Country",
         "default_homepage": "Default Homepage",
         "minimize_comments_default": "Minimize Comments by default",
         "minimize_description_default": "Minimize Description by default",
         "store_watch_history": "Store Watch History",
-        "language_selection": "Language Selection",
+        "language_selection": "Language",
         "instances_list": "Instances List",
         "enabled_codecs": "Enabled Codecs (Multiple)",
-        "instance_selection": "Instance Selection",
+        "instance_selection": "Instance",
         "show_more": "Show More",
         "yes": "Yes",
         "no": "No",
         "export_to_json": "Export to JSON",
-        "import_from_json": "Import from JSON/CSV",
+        "import_from_json": "Import from JSON",
+        "import_from_json_csv": "Import from JSON/CSV",
         "loop_this_video": "Loop this Video",
         "auto_play_next_video": "Auto Play next Video",
         "auto_display_captions": "Auto Display Captions",
@@ -94,15 +101,17 @@
         "delete_playlist": "Delete Playlist",
         "select_playlist": "Select a Playlist",
         "delete_playlist_confirm": "Delete this playlist?",
+        "delete_group_confirm": "Delete this group?",
         "please_select_playlist": "Please select a playlist",
         "delete_account": "Delete Account",
         "logout": "Logout from this device",
         "minimize_recommendations_default": "Minimize Recommendations by default",
         "minimize_chapters_default": "Minimize Chapters by default",
+        "chapters_layout_mobile": "Chapters Layout On Mobile",
         "show_watch_on_youtube": "Show Watch on YouTube button",
         "invalidate_session": "Logout all devices",
         "different_auth_instance": "Use a different instance for authentication",
-        "instance_auth_selection": "Autentication Instance Selection",
+        "instance_auth_selection": "Authentication Instance",
         "clone_playlist": "Clone Playlist",
         "clone_playlist_success": "Successfully cloned!",
         "download_as_txt": "Download as .txt",
@@ -121,12 +130,13 @@
         "copy_link": "Copy link",
         "time_code": "Time code (in seconds)",
         "show_chapters": "Chapters",
-        "store_search_history": "Store Search history",
+        "store_search_history": "Store Search History",
         "hide_watched": "Hide watched videos in the feed",
         "documentation": "Documentation",
         "status_page": "Status",
         "source_code": "Source code",
         "instance_donations": "Instance donations",
+        "instance_privacy_policy": "Privacy Policy",
         "reply_count": "{count} replies",
         "no_valid_playlists": "The file doesn't contain valid playlists!",
         "with_playlist": "Share with playlist",
@@ -137,7 +147,16 @@
         "create_group": "Create group",
         "group_name": "Group name",
         "cancel": "Cancel",
-        "okay": "Okay"
+        "okay": "Okay",
+        "show_search_suggestions": "Show search suggestions",
+        "delete_automatically": "Delete automatically after",
+        "generate_qrcode": "Generate QR Code",
+        "download_frame": "Download frame",
+        "add_to_group": "Add to group",
+        "concurrent_prefetch_limit": "Concurrent Stream Prefetch Limit",
+        "customize": "Customize",
+        "invalid_url": "Invalid URL!",
+        "add": "Add"
     },
     "comment": {
         "pinned_by": "Pinned by {author}",
@@ -152,11 +171,15 @@
         "registered_users": "Registered Users",
         "version": "Version",
         "up_to_date": "Up to date?",
-        "ssl_score": "SSL Score"
+        "ssl_score": "SSL Score",
+        "uptime_30d": "Uptime (30d)",
+        "api_url": "Api URL"
     },
     "login": {
         "username": "Username",
-        "password": "Password"
+        "password": "Password",
+        "password_confirm": "Confirm password",
+        "passwords_incorrect": "Passwords don't match!"
     },
     "video": {
         "videos": "Videos",
@@ -168,7 +191,11 @@
         "live": "{0} Live",
         "shorts": "Shorts",
         "all": "All",
-        "category": "Category"
+        "category": "Category",
+        "license": "License",
+        "visibility": "Visibility",
+        "chapters_horizontal": "Horizontal",
+        "chapters_vertical": "Vertical"
     },
     "search": {
         "did_you_mean": "Did you mean: {0}?",
@@ -179,7 +206,8 @@
         "music_songs": "YT Music: Songs",
         "music_videos": "YT Music: Videos",
         "music_albums": "YT Music: Albums",
-        "music_playlists": "YT Music: Playlists"
+        "music_playlists": "YT Music: Playlists",
+        "music_artists": "YT Music: Artists"
     },
     "subscriptions": {
         "subscribed_channels_count": "Subscribed to: {0}"
@@ -191,6 +219,12 @@
         "cannot_copy": "Can't copy!",
         "local_storage": "This action requires localStorage, are cookies enabled?",
         "register_no_email_note": "Using an e-mail as username is not recommended. Proceed anyways?",
-        "next_video_countdown": "Playing next video in {0}s"
+        "next_video_countdown": "Playing next video in {0}s",
+        "hours": "{amount} hour(s)",
+        "days": "{amount} day(s)",
+        "weeks": "{amount} week(s)",
+        "months": "{amount} month(s)",
+        "register_note": "Register an account for this Piped instance. This will allow you to sync your subscriptions and playlists with your account, so they're stored on the server side. You can use all features without an account, but all data will be stored in your browser's local cache. Please make sure you do NOT use an email address as your username and choose a secure password that you do not use elsewhere.",
+        "login_note": "Log in with an account created on this instance."
     }
 }
